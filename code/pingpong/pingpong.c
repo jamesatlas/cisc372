@@ -3,29 +3,34 @@
 #include<stdio.h>
 #include<mpi.h>
 
-#define NPINGS 1000000
+#define NPINGS 100
 #define TAG 999
 
 int myrank;
 int nprocs;
+
+#define DATA_N 10000
+char GARBAGE[DATA_N];
 
 /* Sends 0-byte message back and forth from p0 to p1 to p0 ....
  * Proc 0 should returns the total time, in seconds.
  * All other procs return 0.0.
  */
 double f(int p0, int p1, int numPings) {
+  double t = MPI_Wtime();
   if (myrank == p0) {
     for (int i=0; i<numPings; i++) {
-      MPI_Send(NULL, 0, MPI_CHAR, p1, TAG, MPI_COMM_WORLD);
-      MPI_Recv(NULL, 0, MPI_CHAR, p1, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Send(&GARBAGE, DATA_N, MPI_CHAR, p1, TAG, MPI_COMM_WORLD);
+      MPI_Recv(&GARBAGE, DATA_N, MPI_CHAR, p1, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
   } else if (myrank == p1) {
     for (int i=0; i<numPings; i++) {
-      MPI_Recv(NULL, 0, MPI_CHAR, p0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      MPI_Send(NULL, 0, MPI_CHAR, p0, TAG, MPI_COMM_WORLD);
+      MPI_Recv(&GARBAGE, DATA_N, MPI_CHAR, p0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Send(&GARBAGE, DATA_N, MPI_CHAR, p0, TAG, MPI_COMM_WORLD);
     }
   }
-  return 0.0;
+  t = MPI_Wtime() - t;
+  return t;
 }
 
 int main(int argc, char *argv[]) { 
