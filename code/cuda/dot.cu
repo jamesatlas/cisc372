@@ -1,20 +1,20 @@
 /*
  * Copyright 1993-2010 NVIDIA Corporation.  All rights reserved.
  *
- * NVIDIA Corporation and its licensors retain all intellectual property and 
- * proprietary rights in and to this software and related documentation. 
- * Any use, reproduction, disclosure, or distribution of this software 
+ * NVIDIA Corporation and its licensors retain all intellectual property and
+ * proprietary rights in and to this software and related documentation.
+ * Any use, reproduction, disclosure, or distribution of this software
  * and related documentation without an express license agreement from
  * NVIDIA Corporation is strictly prohibited.
  *
- * Please refer to the applicable NVIDIA end user license agreement (EULA) 
- * associated with this source code for terms and conditions that govern 
+ * Please refer to the applicable NVIDIA end user license agreement (EULA)
+ * associated with this source code for terms and conditions that govern
  * your use of this NVIDIA software.
- * 
+ *
  */
 
 
-#include "../common/book.h"
+#include "book.h"
 
 #define imin(a,b) (a<b?a:b)
 
@@ -34,10 +34,10 @@ __global__ void dot( float *a, float *b, float *c ) {
         temp += a[tid] * b[tid];
         tid += blockDim.x * gridDim.x;
     }
-    
+
     // set the cache values
     cache[cacheIndex] = temp;
-    
+
     // synchronize threads in this block
     __syncthreads();
 
@@ -83,7 +83,7 @@ int main( void ) {
     HANDLE_ERROR( cudaMemcpy( dev_a, a, N*sizeof(float),
                               cudaMemcpyHostToDevice ) );
     HANDLE_ERROR( cudaMemcpy( dev_b, b, N*sizeof(float),
-                              cudaMemcpyHostToDevice ) ); 
+                              cudaMemcpyHostToDevice ) );
 
     dot<<<blocksPerGrid,threadsPerBlock>>>( dev_a, dev_b,
                                             dev_partial_c );
